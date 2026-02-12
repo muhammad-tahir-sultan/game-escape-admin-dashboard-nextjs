@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import logo from '../../public/logo.png';
 import { motion } from 'framer-motion';
-import { UserPlus, Mail, Lock, User } from 'lucide-react';
+import { UserPlus, Mail, Lock, User, Eye, EyeOff } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { registerAction } from '@/app/actions/auth';
@@ -13,6 +15,8 @@ export default function RegisterPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -51,16 +55,21 @@ export default function RegisterPage() {
             >
                 <div className="glass-strong rounded-2xl p-8 shadow-2xl">
                     {/* Header */}
-                    <div className="text-center mb-8">
+                    <div className="text-center mb-10">
                         <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.2, type: 'spring' }}
-                            className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-primary mb-4"
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="flex justify-center mb-6"
                         >
-                            <UserPlus className="w-8 h-8 text-white" />
+                            <Image
+                                src={logo}
+                                alt="Escape Andalusi"
+                                className="h-16 w-auto object-contain drop-shadow-2xl"
+                                priority
+                            />
                         </motion.div>
-                        <h1 className="text-3xl font-bold text-gradient mb-2">Create Account</h1>
+                        <h1 className="text-3xl font-bold text-gradient mb-2">Escape Andalusi</h1>
                         <p className="text-muted-foreground">Join the admin dashboard</p>
                     </div>
 
@@ -106,26 +115,48 @@ export default function RegisterPage() {
                             <Lock className="absolute left-3 top-[38px] w-5 h-5 text-muted-foreground" />
                             <Input
                                 label="Password"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 placeholder="••••••••"
                                 required
-                                className="pl-11"
+                                className="pl-11 pr-11"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-[38px] text-muted-foreground hover:text-white transition-colors cursor-pointer"
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="w-5 h-5" />
+                                ) : (
+                                    <Eye className="w-5 h-5" />
+                                )}
+                            </button>
                         </div>
 
                         <div className="relative">
                             <Lock className="absolute left-3 top-[38px] w-5 h-5 text-muted-foreground" />
                             <Input
                                 label="Confirm Password"
-                                type="password"
+                                type={showConfirmPassword ? 'text' : 'password'}
                                 value={formData.confirmPassword}
                                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                                 placeholder="••••••••"
                                 required
-                                className="pl-11"
+                                className="pl-11 pr-11"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                className="absolute right-3 top-[38px] text-muted-foreground hover:text-white transition-colors cursor-pointer"
+                            >
+                                {showConfirmPassword ? (
+                                    <EyeOff className="w-5 h-5" />
+                                ) : (
+                                    <Eye className="w-5 h-5" />
+                                )}
+                            </button>
                         </div>
 
                         <Button
