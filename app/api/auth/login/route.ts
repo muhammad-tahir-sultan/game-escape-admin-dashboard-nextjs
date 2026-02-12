@@ -1,7 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import connectDB from '@/lib/mongodb';
-import User from '@/models/User';
-import bcrypt from 'bcryptjs';
+import passport from '@/lib/passport';
 import { createSession } from '@/lib/session';
 
 export async function POST(request: NextRequest) {
@@ -15,9 +13,16 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        await connectDB();
+        // Use Passport to authenticate
+        const user: any = await new Promise((resolve, reject) => {
+            const req = { body: { email, password } } as any;
 
-        const user = await User.findOne({ email }).select('+password');
+            passport.authenticate('local', { session: false }, (err: any, user: any, info: any) => {
+                if (err) return reject(err);
+                if (!user) return resolve(null);
+                resolve(user);
+            })(req, {}, () => { });
+        });
 
         if (!user) {
             return NextResponse.json(
@@ -26,18 +31,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            return NextResponse.json(
-                { error: 'Invalid credentials' },
-                { status: 401 }
-            );
-        }
-
         // Create session
         const sessionUser = {
-            id: user._id.toString(),
+            id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
@@ -51,7 +47,6 @@ export async function POST(request: NextRequest) {
         );
 
         // Set session cookie
-        // IMPORTANT: For localhost, secure must be false if not using https
         const isProduction = process.env.NODE_ENV === 'production';
 
         response.cookies.set('session', sessionData, {

@@ -7,27 +7,26 @@ import bcrypt from 'bcryptjs';
 import { createSession } from '@/lib/session';
 import { registerSchema } from '@/lib/validations';
 
+import passport from '@/lib/passport';
+
 export async function loginAction(email: string, password: string) {
     try {
-        await connectDB();
+        const user: any = await new Promise((resolve, reject) => {
+            const req = { body: { email, password } } as any;
 
-        // 1. Find user
-        const user = await User.findOne({ email }).select('+password');
+            passport.authenticate('local', { session: false }, (err: any, user: any, info: any) => {
+                if (err) return reject(err);
+                if (!user) return resolve(null);
+                resolve(user);
+            })(req, {}, () => { });
+        });
 
         if (!user) {
             return { error: 'Invalid credentials' };
         }
 
-        // 2. Check password
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-
-        if (!isPasswordValid) {
-            return { error: 'Invalid credentials' };
-        }
-
-        // 3. Create session object
         const sessionUser = {
-            id: user._id.toString(),
+            id: user.id,
             name: user.name,
             email: user.email,
             role: user.role,
@@ -35,7 +34,6 @@ export async function loginAction(email: string, password: string) {
 
         const sessionData = createSession(sessionUser);
 
-        // 4. Set cookie
         const isProduction = process.env.NODE_ENV === 'production';
         const cookieStore = await cookies();
 

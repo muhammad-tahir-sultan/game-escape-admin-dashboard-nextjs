@@ -32,12 +32,17 @@ export default function Sidebar() {
     const { isCollapsed, toggleSidebar } = useSidebar();
     const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
-    async function handleLogout() {
+    const handleLogoutClick = () => {
+        setShowLogoutConfirm(true);
+    };
+
+    async function handleConfirmLogout() {
         await logoutAction();
         window.location.href = '/login';
     }
@@ -67,6 +72,51 @@ export default function Sidebar() {
                         className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
                         onClick={() => setIsMobileOpen(false)}
                     />
+                )}
+            </AnimatePresence>
+
+            {/* Logout Confirmation Modal */}
+            <AnimatePresence>
+                {showLogoutConfirm && (
+                    <>
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setShowLogoutConfirm(false)}
+                            className="fixed inset-0 bg-black/80 backdrop-blur-md z-[100]"
+                        />
+                        <div className="fixed inset-0 flex items-center justify-center z-[110] p-4 pointer-events-none">
+                            <motion.div
+                                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                                animate={{ opacity: 1, scale: 1, y: 0 }}
+                                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                                className="pointer-events-auto w-full max-w-sm glass-strong rounded-3xl p-8 border border-white/10 shadow-2xl text-center"
+                            >
+                                <div className="w-16 h-16 rounded-2xl bg-red-500/10 flex items-center justify-center mx-auto mb-6">
+                                    <LogOut className="w-8 h-8 text-red-400" />
+                                </div>
+                                <h3 className="text-xl font-bold text-white mb-2">Ready to Leave?</h3>
+                                <p className="text-muted-foreground mb-8">
+                                    Are you sure you want to log out of your session?
+                                </p>
+                                <div className="flex flex-col gap-3">
+                                    <button
+                                        onClick={handleConfirmLogout}
+                                        className="cursor-pointer w-full py-3 rounded-xl bg-red-500 hover:bg-red-600 text-white font-bold transition-all shadow-lg shadow-red-500/20 active:scale-[0.98]"
+                                    >
+                                        Log Out
+                                    </button>
+                                    <button
+                                        onClick={() => setShowLogoutConfirm(false)}
+                                        className="cursor-pointer w-full py-3 rounded-xl bg-white/5 hover:bg-white/10 text-white font-medium transition-all border border-white/10 active:scale-[0.98]"
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </motion.div>
+                        </div>
+                    </>
                 )}
             </AnimatePresence>
 
@@ -185,11 +235,11 @@ export default function Sidebar() {
 
                         {/* Logout */}
                         <button
-                            onClick={handleLogout}
+                            onClick={handleLogoutClick}
                             className={`flex cursor-pointer items-center gap-3 w-full px-3 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 group ${isCollapsed ? 'justify-center' : ''}`}
                         >
-                            <LogOut className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
-                            {!isCollapsed && <span className="font-medium">Logout</span>}
+                            <LogOut className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform cursor-pointer" />
+                            {!isCollapsed && <span className="font-medium cursor-pointer">Logout</span>}
                         </button>
                     </div>
                 </div>

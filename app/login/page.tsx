@@ -5,34 +5,44 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { LogIn, Mail, Lock } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
 import { loginAction } from '@/app/actions/auth';
+import { loginSchema, type LoginInput } from '@/lib/validations';
 
 export default function LoginPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState('');
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
+    const [serverError, setServerError] = useState('');
+
+    const {
+        register,
+        handleSubmit,
+        formState: { errors }
+    } = useForm<LoginInput>({
+        resolver: zodResolver(loginSchema),
+        defaultValues: {
+            email: '',
+            password: '',
+        }
     });
 
-    async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-        e.preventDefault();
+    const onSubmit = async (data: LoginInput) => {
         setIsLoading(true);
-        setError('');
+        setServerError('');
 
-        const result = await loginAction(formData.email, formData.password);
+        const result = await loginAction(data.email, data.password);
 
         if (result.error) {
-            setError(result.error);
+            setServerError(result.error);
             setIsLoading(false);
         } else {
             // Force a hard navigation to ensure middleware runs
             window.location.href = '/dashboard';
         }
-    }
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
@@ -64,14 +74,14 @@ export default function LoginPage() {
                     </div>
 
                     {/* Form */}
-                    <form onSubmit={handleSubmit} className="space-y-5">
-                        {error && (
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+                        {(serverError || errors.email || errors.password) && (
                             <motion.div
                                 initial={{ opacity: 0, y: -10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 className="p-3 rounded-lg bg-red-500/10 border border-red-500/50 text-red-400 text-sm"
                             >
-                                {error}
+                                {serverError || errors.email?.message || errors.password?.message}
                             </motion.div>
                         )}
 
@@ -80,10 +90,9 @@ export default function LoginPage() {
                             <Input
                                 label="Email"
                                 type="email"
-                                value={formData.email}
-                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                {...register('email')}
+                                error={errors.email?.message}
                                 placeholder="admin@example.com"
-                                required
                                 className="pl-11"
                             />
                         </div>
@@ -93,10 +102,9 @@ export default function LoginPage() {
                             <Input
                                 label="Password"
                                 type="password"
-                                value={formData.password}
-                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                {...register('password')}
+                                error={errors.password?.message}
                                 placeholder="••••••••"
-                                required
                                 className="pl-11"
                             />
                         </div>
@@ -105,7 +113,7 @@ export default function LoginPage() {
                             type="submit"
                             variant="primary"
                             size="lg"
-                            className="w-full"
+                            className="w-full cursor-pointer"
                             isLoading={isLoading}
                         >
                             Sign In

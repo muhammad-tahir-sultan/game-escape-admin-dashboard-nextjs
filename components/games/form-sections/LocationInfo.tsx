@@ -1,31 +1,30 @@
 'use client';
 
-interface LocationInfoProps {
-    game?: any;
-}
+import { useFormContext } from 'react-hook-form';
+import Input from '@/components/ui/Input';
 
-export default function LocationInfo({ game }: LocationInfoProps) {
+export default function LocationInfo() {
+    const { register, formState: { errors } } = useFormContext();
+
     return (
         <div className="space-y-6">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2.5">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Place (Area Name)</label>
-                    <input
-                        name="place"
-                        defaultValue={game?.place}
-                        required
+                    <Input
+                        {...register('place')}
                         placeholder="e.g. Vienna Central"
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                        error={errors.place?.message as string}
+                        className="!bg-white/5 !border-white/10 !text-white !py-3 !rounded-xl"
                     />
                 </div>
                 <div className="space-y-2.5">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Distance (Mission Path)</label>
-                    <input
-                        name="distance"
-                        defaultValue={game?.distance}
-                        required
+                    <Input
+                        {...register('distance')}
                         placeholder="e.g. 2.4 km"
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                        error={errors.distance?.message as string}
+                        className="!bg-white/5 !border-white/10 !text-white !py-3 !rounded-xl"
                     />
                 </div>
             </div>
@@ -33,24 +32,22 @@ export default function LocationInfo({ game }: LocationInfoProps) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div className="space-y-2.5">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Main Mission Latitude</label>
-                    <input
-                        name="lat"
+                    <Input
                         type="number"
                         step="any"
-                        defaultValue={game?.lat || 0}
-                        required
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                        {...register('lat', { valueAsNumber: true })}
+                        error={errors.lat?.message as string}
+                        className="!bg-white/5 !border-white/10 !text-white !py-3 !rounded-xl"
                     />
                 </div>
                 <div className="space-y-2.5">
                     <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Main Mission Longitude</label>
-                    <input
-                        name="lng"
+                    <Input
                         type="number"
                         step="any"
-                        defaultValue={game?.lng || 0}
-                        required
-                        className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                        {...register('lng', { valueAsNumber: true })}
+                        error={errors.lng?.message as string}
+                        className="!bg-white/5 !border-white/10 !text-white !py-3 !rounded-xl"
                     />
                 </div>
             </div>

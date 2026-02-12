@@ -1,41 +1,61 @@
 'use client';
 
-interface MediaInfoProps {
-    game?: any;
-}
+import { useFormContext, Controller } from 'react-hook-form';
+import Input from '@/components/ui/Input';
 
-export default function MediaInfo({ game }: MediaInfoProps) {
+export default function MediaInfo() {
+    const { register, control, formState: { errors } } = useFormContext();
+
     return (
         <div className="space-y-6">
             <div className="space-y-2.5">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Thumbnail URL</label>
-                <input
-                    name="thumbnail"
+                <Input
+                    {...register('thumbnail')}
                     type="url"
-                    defaultValue={game?.thumbnail}
-                    required
                     placeholder="https://..."
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                    error={errors.thumbnail?.message as string}
+                    className="!bg-white/5 !border-white/10 !text-white !py-3 !rounded-xl"
                 />
             </div>
 
             <div className="space-y-2.5">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Images (URLs, comma separated)</label>
-                <input
+                <Controller
                     name="images"
-                    defaultValue={game?.images?.join(', ') || ''}
-                    placeholder="https://example.com/1.jpg, https://example.com/2.jpg"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                field.onChange(val.split(',').map(s => s.trim()).filter(Boolean));
+                            }}
+                            placeholder="https://example.com/1.jpg, https://example.com/2.jpg"
+                            error={errors.images?.message as string}
+                            className="!bg-white/5 !border-white/10 !text-white !py-3 !rounded-xl"
+                        />
+                    )}
                 />
             </div>
 
             <div className="space-y-2.5">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase tracking-widest ml-1">Tags (comma separated)</label>
-                <input
+                <Controller
                     name="tags"
-                    defaultValue={game?.tags?.join(', ') || ''}
-                    placeholder="mystery, horror, family"
-                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all"
+                    control={control}
+                    render={({ field }) => (
+                        <Input
+                            value={Array.isArray(field.value) ? field.value.join(', ') : field.value}
+                            onChange={(e) => {
+                                const val = e.target.value;
+                                field.onChange(val.split(',').map(s => s.trim()).filter(Boolean));
+                            }}
+                            placeholder="mystery, horror, family"
+                            error={errors.tags?.message as string}
+                            className="!bg-white/5 !border-white/10 !text-white !py-3 !rounded-xl"
+                        />
+                    )}
                 />
             </div>
         </div>
