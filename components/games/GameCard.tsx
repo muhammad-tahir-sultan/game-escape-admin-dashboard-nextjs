@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Edit, Trash2, Clock, Users, DollarSign, Power, MoreVertical, PlayCircle } from 'lucide-react';
+import { Edit, Trash2, Clock, Users, Power } from 'lucide-react';
 import { deleteGame, toggleGameStatus } from '@/app/actions/games';
 import { toast } from 'react-hot-toast';
 import ConfirmDialog from '@/components/ui/ConfirmDialog';
@@ -26,33 +26,31 @@ export default function GameCard({ game, onEdit }: GameCardProps) {
     const [isToggling, setIsToggling] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-    async function handleDelete() {
+    const handleDelete = async () => {
         setIsDeleting(true);
         const result = await deleteGame(game._id);
         if (!result.error) {
             toast.success('Game deleted successfully');
-            setShowDeleteDialog(false);
             router.refresh();
         } else {
             toast.error(result.error);
-            setIsDeleting(false);
-            setShowDeleteDialog(false);
         }
-    }
+        setIsDeleting(false);
+        setShowDeleteDialog(false);
+    };
 
-    async function handleToggleStatus() {
+    const handleToggleStatus = async () => {
         setIsToggling(true);
         const result = await toggleGameStatus(game._id);
         if (!result.error) {
             toast.success(`Game ${game.isActive ? 'deactivated' : 'activated'}`);
             router.refresh();
-            // Reset loading state after a slight delay to allow UI to update
             setTimeout(() => setIsToggling(false), 500);
         } else {
             toast.error(result.error);
             setIsToggling(false);
         }
-    }
+    };
 
     return (
         <>
@@ -60,7 +58,7 @@ export default function GameCard({ game, onEdit }: GameCardProps) {
                 whileHover={{ y: -5 }}
                 className="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:shadow-2xl hover:shadow-purple-500/10 transition-all duration-300"
             >
-                {/* Image Area */}
+                {/* Image Section */}
                 <div className="relative h-48 overflow-hidden cursor-pointer" onClick={() => onEdit(game)}>
                     <img
                         src={game.thumbnail || 'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=2071&auto=format&fit=crop'}
@@ -69,110 +67,65 @@ export default function GameCard({ game, onEdit }: GameCardProps) {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                    {/* Status Badge */}
-                    <div className="absolute top-3 left-3 flex gap-2">
-                        <span className={`
-            px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md border shadow-lg
-            ${game.isActive
-                                ? 'bg-green-500/20 text-green-400 border-green-500/30'
-                                : 'bg-red-500/20 text-red-400 border-red-500/30'
-                            }
-          `}>
-                            {game.isActive ? 'Active' : 'Inactive'}
-                        </span>
+                    <div className="absolute top-3 left-3">
+                        <StatusBadge isActive={game.isActive} />
                     </div>
 
-                    {/* Edit Overlay on Hover */}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-[2px]">
-                        <button
-                            onClick={(e) => { e.stopPropagation(); onEdit(game); }}
-                            className="bg-white/10 hover:bg-white/20 text-white rounded-full p-3 backdrop-blur-md border border-white/20 transition-all transform hover:scale-110 cursor-pointer"
-                        >
-                            <Edit className="w-6 h-6" />
-                        </button>
+                        <div className="bg-white/10 p-3 rounded-full backdrop-blur-md border border-white/20 transform hover:scale-110 transition-all">
+                            <Edit className="w-6 h-6 text-white" />
+                        </div>
                     </div>
                 </div>
 
-                {/* Content Area */}
+                {/* Content Section */}
                 <div className="p-5">
                     <div className="flex justify-between items-start mb-3">
                         <div>
-                            <h3
-                                className="text-lg font-bold text-white group-hover:text-primary transition-colors cursor-pointer line-clamp-1"
-                                onClick={() => onEdit(game)}
-                            >
+                            <h3 className="text-lg font-bold text-white group-hover:text-primary transition-colors cursor-pointer line-clamp-1" onClick={() => onEdit(game)}>
                                 {game.title}
                             </h3>
                             <div className="flex items-center gap-2 mt-1">
-                                <span className={`
-                        text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r 
-                        ${difficultyColors[game.difficulty as keyof typeof difficultyColors] || 'from-gray-400 to-gray-500'}
-                    `}>
+                                <span className={`text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r ${difficultyColors[game.difficulty as keyof typeof difficultyColors] || 'from-gray-400 to-gray-500'}`}>
                                     {game.difficulty}
                                 </span>
                                 <span className="text-white/20">•</span>
-                                <span className="text-xs text-muted-foreground">{game.players || '2-6'} Players</span>
+                                <span className="text-xs text-muted-foreground">{game.minPlayers}-{game.maxPlayers} Players</span>
                             </div>
                         </div>
-                        <div className="text-right">
-                            <p className="text-lg font-bold text-white">${game.price}</p>
-                        </div>
+                        <p className="text-lg font-bold text-white">${game.price}</p>
                     </div>
 
                     <p className="text-sm text-muted-foreground line-clamp-2 mb-4 h-10">
                         {game.description || 'No description available for this mission.'}
                     </p>
 
-                    {/* Info Grid */}
                     <div className="grid grid-cols-2 gap-2 mb-4">
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-white/5 rounded-lg p-2">
-                            <Clock className="w-3.5 h-3.5 text-primary" />
-                            <span>{game.duration} mins</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-white/5 rounded-lg p-2">
-                            <Users className="w-3.5 h-3.5 text-accent" />
-                            <span>{game.minPlayers}-{game.maxPlayers} ppl</span>
-                        </div>
+                        <InfoTag icon={<Clock className="w-3.5 h-3.5 text-primary" />} label={`${game.duration} mins`} />
+                        <InfoTag icon={<Users className="w-3.5 h-3.5 text-accent" />} label={`${game.minPlayers}-${game.maxPlayers} ppl`} />
                     </div>
 
-                    {/* Action Buttons */}
                     <div className="flex items-center gap-2 pt-2 border-t border-white/10">
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
+                        <ActionButton
                             onClick={() => onEdit(game)}
-                            className="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white/5 text-sm font-medium hover:bg-white/10 text-white transition-colors cursor-pointer group/edit"
-                        >
-                            <Edit className="w-4 h-4 text-muted-foreground group-hover/edit:text-primary transition-colors" />
-                            <span>Edit</span>
-                        </motion.button>
-
+                            icon={<Edit className="w-4 h-4" />}
+                            label="Edit"
+                            className="flex-1"
+                        />
                         <div className="w-[1px] h-8 bg-white/10 mx-1" />
-
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                        <IconButton
                             onClick={handleToggleStatus}
-                            disabled={isToggling}
-                            title={game.isActive ? "Deactivate Game" : "Activate Game"}
-                            className={`p-2 rounded-xl border transition-all cursor-pointer ${game.isActive
-                                ? 'border-green-500/20 bg-green-500/10 hover:bg-green-500/20 text-green-400'
-                                : 'border-white/10 bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white'
-                                }`}
-                        >
-                            <Power className={`w-4 h-4 ${isToggling ? 'animate-pulse' : ''}`} />
-                        </motion.button>
-
-                        <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
+                            icon={<Power className={`w-4 h-4 ${isToggling ? 'animate-pulse' : ''}`} />}
+                            isActive={game.isActive}
+                            isLoading={isToggling}
+                            activeClass="border-green-500/20 bg-green-500/10 text-green-400"
+                        />
+                        <IconButton
                             onClick={() => setShowDeleteDialog(true)}
-                            disabled={isDeleting}
-                            title="Delete Game"
-                            className="p-2 rounded-xl border border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400 transition-all cursor-pointer"
-                        >
-                            <Trash2 className={`w-4 h-4 ${isDeleting ? 'animate-pulse' : ''}`} />
-                        </motion.button>
+                            icon={<Trash2 className={`w-4 h-4 ${isDeleting ? 'animate-pulse' : ''}`} />}
+                            variant="danger"
+                            isLoading={isDeleting}
+                        />
                     </div>
                 </div>
             </motion.div>
@@ -182,7 +135,7 @@ export default function GameCard({ game, onEdit }: GameCardProps) {
                 onClose={() => setShowDeleteDialog(false)}
                 onConfirm={handleDelete}
                 title="Delete Game?"
-                description={`Are you sure you want to delete "${game.title}"? This action cannot be undone and all mission data will be lost.`}
+                description={`Are you sure you want to delete "${game.title}"? This action cannot be undone.`}
                 confirmText="Delete Mission"
                 isLoading={isDeleting}
                 variant="danger"
@@ -190,3 +143,59 @@ export default function GameCard({ game, onEdit }: GameCardProps) {
         </>
     );
 }
+
+// --- Internal Sub-components ---
+
+function StatusBadge({ isActive }: { isActive: boolean }) {
+    return (
+        <span className={`px-3 py-1 rounded-full text-xs font-semibold backdrop-blur-md border shadow-lg ${isActive ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30'
+            }`}>
+            {isActive ? 'Active' : 'Inactive'}
+        </span>
+    );
+}
+
+function InfoTag({ icon, label }: { icon: React.ReactNode; label: string }) {
+    return (
+        <div className="flex items-center gap-2 text-xs text-muted-foreground bg-white/5 rounded-lg p-2">
+            {icon}
+            <span>{label}</span>
+        </div>
+    );
+}
+
+function ActionButton({ onClick, icon, label, className = '' }: any) {
+    return (
+        <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            onClick={onClick}
+            className={`flex items-center justify-center gap-2 px-3 py-2 rounded-xl bg-white/5 text-sm font-medium hover:bg-white/10 text-white transition-all cursor-pointer ${className}`}
+        >
+            {icon}
+            <span>{label}</span>
+        </motion.button>
+    );
+}
+
+function IconButton({ onClick, icon, isActive, variant, isLoading, activeClass }: any) {
+    const baseClass = "p-2 rounded-xl border transition-all cursor-pointer";
+    const variantClass = variant === 'danger'
+        ? "border-red-500/20 bg-red-500/10 hover:bg-red-500/20 text-red-400"
+        : isActive
+            ? activeClass
+            : "border-white/10 bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white";
+
+    return (
+        <motion.button
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            onClick={onClick}
+            disabled={isLoading}
+            className={`${baseClass} ${variantClass}`}
+        >
+            {icon}
+        </motion.button>
+    );
+}
+

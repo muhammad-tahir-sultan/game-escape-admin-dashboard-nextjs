@@ -2,11 +2,21 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Search, Filter } from 'lucide-react';
+import { Plus, Search, Filter, Gamepad2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import GameForm from '@/components/games/GameForm';
 import GameCard from '@/components/games/GameCard';
+import Select from '@/components/ui/Select';
+import EmptyState from '@/components/ui/EmptyState';
+
+const filterOptions = [
+    { label: 'All Difficulties', value: 'all' },
+    { label: 'Easy', value: 'Easy' },
+    { label: 'Medium', value: 'Medium' },
+    { label: 'Hard', value: 'Hard' },
+    { label: 'Expert', value: 'Expert' },
+];
 
 interface GamesListProps {
     initialGames: any[];
@@ -18,6 +28,7 @@ export default function GamesList({ initialGames }: GamesListProps) {
     useEffect(() => {
         setGames(initialGames);
     }, [initialGames]);
+
     const [isFormOpen, setIsFormOpen] = useState(false);
     const [selectedGame, setSelectedGame] = useState<any>(null);
     const [searchTerm, setSearchTerm] = useState('');
@@ -59,10 +70,10 @@ export default function GamesList({ initialGames }: GamesListProps) {
             </div>
 
             {/* Filters */}
-            <Card>
+            <Card className="relative z-20">
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1 relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground z-10" />
                         <input
                             type="search"
                             placeholder="Search games..."
@@ -71,28 +82,31 @@ export default function GamesList({ initialGames }: GamesListProps) {
                             className="w-full pl-11 pr-4 py-2.5 glass rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
                         />
                     </div>
-                    <div className="flex items-center gap-2">
-                        <Filter className="w-5 h-5 text-muted-foreground" />
-                        <select
+                    <div className="flex items-center gap-2 min-w-[200px]">
+                        <Filter className="w-5 h-5 text-muted-foreground shrink-0" />
+                        <Select
                             value={filterDifficulty}
-                            onChange={(e) => setFilterDifficulty(e.target.value)}
-                            className="px-4 py-2.5 rounded-lg bg-[#1a1a20] border border-white/10 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all cursor-pointer"
-                        >
-                            <option value="all" className="bg-[#1a1a20] text-white">All Difficulties</option>
-                            <option value="Easy" className="bg-[#1a1a20] text-white">Easy</option>
-                            <option value="Medium" className="bg-[#1a1a20] text-white">Medium</option>
-                            <option value="Hard" className="bg-[#1a1a20] text-white">Hard</option>
-                            <option value="Expert" className="bg-[#1a1a20] text-white">Expert</option>
-                        </select>
+                            onChange={(val) => setFilterDifficulty(val)}
+                            options={filterOptions}
+                            className="flex-1"
+                            size="sm"
+                        />
                     </div>
                 </div>
             </Card>
+            <div className="pt-2" />
 
             {/* Games Grid */}
             {filteredGames.length === 0 ? (
-                <Card className="text-center py-12">
-                    <p className="text-muted-foreground">No games found. Create your first game!</p>
-                </Card>
+                <EmptyState
+                    icon={Gamepad2}
+                    title={searchTerm || filterDifficulty !== 'all' ? "No matches found" : "No missions found"}
+                    description={searchTerm || filterDifficulty !== 'all'
+                        ? "Try adjusting your search filters to find what you're looking for."
+                        : "Your mission gallery is empty. Let's create something spectacular!"}
+                    actionLabel={!(searchTerm || filterDifficulty !== 'all') ? "Create Mission" : undefined}
+                    onAction={() => setIsFormOpen(true)}
+                />
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {filteredGames.map((game, index) => (

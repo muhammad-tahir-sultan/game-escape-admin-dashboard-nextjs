@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { Gamepad2, Users, DollarSign, TrendingUp, ArrowUpRight } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Link from 'next/link';
+import EmptyState from '@/components/ui/EmptyState';
 
 // Animation variants
 const container = {
@@ -142,9 +143,14 @@ export default function DashboardContent({ stats }: DashboardContentProps) {
                             <Link href="/dashboard/games" className="text-sm text-primary hover:text-accent transition-colors">View All</Link>
                         </div>
 
-                        <div className="space-y-4">
+                        <div className="space-y-4 h-full">
                             {stats.recentGames.length === 0 ? (
-                                <p className="text-center text-muted-foreground py-8">No games found.</p>
+                                <EmptyState
+                                    icon={Gamepad2}
+                                    title="No Missions Yet"
+                                    description="Start building your escape room empire by creating your first mission!"
+                                    className="h-full min-h-[300px]"
+                                />
                             ) : (
                                 stats.recentGames.map((game) => (
                                     <div
