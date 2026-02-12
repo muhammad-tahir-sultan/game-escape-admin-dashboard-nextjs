@@ -3,8 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
+import logo from '../../public/logo.png';
 import { motion } from 'framer-motion';
-import { LogIn, Mail, Lock } from 'lucide-react';
+import { LogIn, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Button from '@/components/ui/Button';
@@ -16,6 +18,7 @@ export default function LoginPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
     const [serverError, setServerError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
 
     const {
         register,
@@ -60,16 +63,21 @@ export default function LoginPage() {
             >
                 <div className="glass-strong rounded-2xl p-8 shadow-2xl">
                     {/* Header */}
-                    <div className="text-center mb-8">
+                    <div className="text-center mb-10">
                         <motion.div
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.2, type: 'spring' }}
-                            className="inline-flex items-center justify-center w-16 h-16 rounded-full gradient-primary mb-4"
+                            initial={{ opacity: 0, y: -20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="flex justify-center mb-6"
                         >
-                            <LogIn className="w-8 h-8 text-white" />
+                            <Image
+                                src={logo}
+                                alt="Escape Andalusi"
+                                className="h-16 w-auto object-contain drop-shadow-2xl"
+                                priority
+                            />
                         </motion.div>
-                        <h1 className="text-3xl font-bold text-gradient mb-2">Welcome Back</h1>
+                        <h1 className="text-3xl font-bold text-gradient mb-2">Escape Andalusi</h1>
                         <p className="text-muted-foreground">Sign in to your admin dashboard</p>
                     </div>
 
@@ -101,12 +109,23 @@ export default function LoginPage() {
                             <Lock className="absolute left-3 top-[38px] w-5 h-5 text-muted-foreground" />
                             <Input
                                 label="Password"
-                                type="password"
+                                type={showPassword ? 'text' : 'password'}
                                 {...register('password')}
                                 error={errors.password?.message}
                                 placeholder="••••••••"
-                                className="pl-11"
+                                className="pl-11 pr-11"
                             />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="absolute right-3 top-[38px] text-muted-foreground hover:text-white transition-colors cursor-pointer"
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="w-5 h-5" />
+                                ) : (
+                                    <Eye className="w-5 h-5" />
+                                )}
+                            </button>
                         </div>
 
                         <Button

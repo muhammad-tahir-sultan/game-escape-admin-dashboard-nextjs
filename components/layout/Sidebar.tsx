@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -142,8 +143,8 @@ export default function Sidebar() {
                 <div className="flex flex-col h-full p-4">
                     {/* Logo Area */}
                     <div className={`mb-8 flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'px-2'}`}>
-                        <div className="w-10 h-10 shrink-0 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-purple-500/20">
-                            <span className="text-xl font-bold text-white">E</span>
+                        <div className="w-10 h-10 shrink-0 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-purple-500/25 overflow-hidden">
+                            <span className="text-xl font-bold text-white tracking-wider">EA</span>
                         </div>
                         {!isCollapsed && (
                             <motion.div
@@ -152,9 +153,9 @@ export default function Sidebar() {
                                 transition={{ delay: 0.1 }}
                             >
                                 <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70 whitespace-nowrap">
-                                    Escape Admin
+                                    Escape Andalusi
                                 </h1>
-                                <p className="text-xs text-muted-foreground">Premium Dashboard</p>
+                                <p className="text-xs text-muted-foreground whitespace-nowrap">Admin Dashboard</p>
                             </motion.div>
                         )}
                     </div>
