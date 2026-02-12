@@ -18,9 +18,9 @@ const interactionOptions = [
 
 export default function RiddleItem({ q, index, onUpdate, onRemove }: RiddleItemProps) {
     return (
-        <div className="group relative bg-[#0f0f13] border border-white/5 rounded-2xl overflow-hidden hover:border-white/20 transition-all duration-300 shadow-xl">
+        <div className="group relative bg-[#0f0f13] border border-white/5 rounded-2xl hover:border-white/20 transition-all duration-300 shadow-xl z-0 focus-within:z-10">
             {/* Header / Grab Handle Area */}
-            <div className="flex items-center justify-between px-5 py-3 bg-white/5 border-b border-white/5">
+            <div className="flex items-center justify-between px-5 py-3 bg-white/5 border-b border-white/5 rounded-t-2xl">
                 <div className="flex items-center gap-4">
                     <div className="cursor-grab active:cursor-grabbing p-1 hover:bg-white/10 rounded transition-colors">
                         <GripVertical className="w-4 h-4 text-white/20" />
@@ -30,7 +30,7 @@ export default function RiddleItem({ q, index, onUpdate, onRemove }: RiddleItemP
                             {index + 1}
                         </div>
                         <input
-                            className="bg-transparent border-none text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500/30 px-2 py-0.5 rounded transition-all placeholder:text-white/20"
+                            className="bg-transparent border-none text-white font-bold text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500/30 px-2 py-0.5 rounded transition-all placeholder:text-white/40"
                             value={q.name}
                             placeholder="Objective Name..."
                             onChange={(e) => onUpdate(index, 'name', e.target.value)}
@@ -58,7 +58,7 @@ export default function RiddleItem({ q, index, onUpdate, onRemove }: RiddleItemP
                         <textarea
                             rows={3}
                             placeholder="Set the atmosphere for this specific objective..."
-                            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all resize-none placeholder:text-white/10"
+                            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all resize-none placeholder:text-white/40"
                             value={q.intro}
                             onChange={(e) => onUpdate(index, 'intro', e.target.value)}
                         />
@@ -71,7 +71,7 @@ export default function RiddleItem({ q, index, onUpdate, onRemove }: RiddleItemP
                         <textarea
                             rows={3}
                             placeholder="What exactly should the players do here?"
-                            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all resize-none placeholder:text-white/10"
+                            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all resize-none placeholder:text-white/40"
                             value={q.text}
                             onChange={(e) => onUpdate(index, 'text', e.target.value)}
                         />
@@ -87,7 +87,7 @@ export default function RiddleItem({ q, index, onUpdate, onRemove }: RiddleItemP
                         <textarea
                             rows={2}
                             placeholder="Enter the actual riddle or puzzle question..."
-                            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all resize-none placeholder:text-white/10"
+                            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all resize-none placeholder:text-white/40"
                             value={q.riddle}
                             onChange={(e) => onUpdate(index, 'riddle', e.target.value)}
                         />
@@ -99,7 +99,7 @@ export default function RiddleItem({ q, index, onUpdate, onRemove }: RiddleItemP
                         </div>
                         <input
                             placeholder="Enter the expected answer code..."
-                            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all placeholder:text-white/10"
+                            className="w-full px-4 py-3 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all placeholder:text-white/40"
                             value={q.rightAnswer}
                             onChange={(e) => onUpdate(index, 'rightAnswer', e.target.value)}
                         />
@@ -125,7 +125,7 @@ export default function RiddleItem({ q, index, onUpdate, onRemove }: RiddleItemP
                                 type="number"
                                 step="any"
                                 placeholder="Latitude"
-                                className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all placeholder:text-white/20"
+                                className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all placeholder:text-white/40"
                                 value={q.lat}
                                 onChange={(e) => onUpdate(index, 'lat', parseFloat(e.target.value))}
                             />
@@ -135,7 +135,7 @@ export default function RiddleItem({ q, index, onUpdate, onRemove }: RiddleItemP
                                 type="number"
                                 step="any"
                                 placeholder="Longitude"
-                                className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all placeholder:text-white/20"
+                                className="w-full px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 text-sm text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-transparent transition-all placeholder:text-white/40"
                                 value={q.lng}
                                 onChange={(e) => onUpdate(index, 'lng', parseFloat(e.target.value))}
                             />

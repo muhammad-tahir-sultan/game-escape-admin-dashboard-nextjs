@@ -21,7 +21,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                     className={`
             w-full px-4 py-2.5 rounded-lg
             glass
-            text-foreground placeholder:text-muted-foreground
+            text-foreground placeholder:text-foreground/30
             focus:outline-none focus:ring-2 focus:ring-primary/50
             transition-all duration-200
             ${error ? 'ring-2 ring-red-500' : ''}

@@ -43,7 +43,7 @@ export default function FormSidebar({ tabs, activeTab, setActiveTab, game, isLoa
                                 type="button"
                                 onClick={() => setActiveTab(tab.id)}
                                 className={`
-                                    w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative
+                                    w-full cursor-pointer flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative
                                     ${isActive
                                         ? 'bg-white/10 text-white shadow-xl shadow-black/20'
                                         : 'text-muted-foreground hover:bg-white/5 hover:text-white/80'

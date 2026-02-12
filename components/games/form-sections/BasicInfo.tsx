@@ -32,7 +32,7 @@ export default function BasicInfo() {
                     {...register('description')}
                     rows={4}
                     placeholder="Describe the mission..."
-                    className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all resize-none ${errors.description ? 'border-red-500' : 'border-white/10'}`}
+                    className={`w-full px-4 py-3 rounded-xl bg-white/5 border text-white placeholder:text-white/40 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-transparent transition-all resize-none ${errors.description ? 'border-red-500' : 'border-white/10'}`}
                 />
                 {errors.description && <p className="text-xs text-red-500 mt-1">{errors.description.message as string}</p>}
             </div>

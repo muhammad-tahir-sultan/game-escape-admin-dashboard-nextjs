@@ -89,7 +89,7 @@ export default function Select({
                     ${sizeClasses[size]}
                 `}
             >
-                <span className={`truncate mr-2 ${selectedOption ? 'text-white' : 'text-gray-500'}`}>
+                <span className={`truncate mr-2 ${selectedOption ? 'text-white' : 'text-white/40'}`}>
                     {selectedOption ? selectedOption.label : placeholder}
                 </span>
                 <motion.div
