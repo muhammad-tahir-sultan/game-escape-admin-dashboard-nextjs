@@ -54,7 +54,7 @@ function parseQuestions(input: string | null | undefined): any[] {
 }
 
 
-export async function getGames(search?: string, difficulty?: string) {
+export async function getGames(search?: string, difficulty?: string, page: number = 1, limit: number = 6) {
     try {
         await connectDB();
         const query: any = {};
@@ -70,8 +70,24 @@ export async function getGames(search?: string, difficulty?: string) {
             query.difficulty = difficulty;
         }
 
-        const games = await Game.find(query).sort({ createdAt: -1 }).lean();
-        return { success: true, games: formatResponse(games) };
+        const skip = (page - 1) * limit;
+        const total = await Game.countDocuments(query);
+        const games = await Game.find(query)
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
+        return {
+            success: true,
+            games: formatResponse(games),
+            pagination: {
+                total,
+                page,
+                limit,
+                totalPages: Math.ceil(total / limit)
+            }
+        };
     } catch (error: any) {
         console.error('getGames error:', error);
         return { error: error.message || 'Failed to fetch games' };

@@ -12,10 +12,13 @@ import {
     LogOut,
     Menu,
     X,
-    ChevronRight
+    ChevronRight,
+    PanelLeftClose,
+    PanelLeftOpen
 } from 'lucide-react';
 import { logoutAction } from '@/app/actions/auth';
 import { SidebarSkeleton } from './SidebarSkeleton';
+import { useSidebar } from '@/context/SidebarContext';
 
 const menuItems = [
     { icon: LayoutDashboard, label: 'Dashboard', href: '/dashboard' },
@@ -26,7 +29,8 @@ const menuItems = [
 
 export default function Sidebar() {
     const pathname = usePathname();
-    const [isOpen, setIsOpen] = useState(false);
+    const { isCollapsed, toggleSidebar } = useSidebar();
+    const [isMobileOpen, setIsMobileOpen] = useState(false);
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => {
@@ -47,21 +51,21 @@ export default function Sidebar() {
         <>
             {/* Mobile menu button */}
             <button
-                onClick={() => setIsOpen(!isOpen)}
+                onClick={() => setIsMobileOpen(!isMobileOpen)}
                 className="lg:hidden fixed top-4 left-4 z-50 p-2 glass-strong rounded-lg hover:bg-white/10 transition-colors"
             >
-                {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {isMobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
 
-            {/* Overlay */}
+            {/* Mobile Overlay */}
             <AnimatePresence>
-                {isOpen && (
+                {isMobileOpen && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
                         className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
-                        onClick={() => setIsOpen(false)}
+                        onClick={() => setIsMobileOpen(false)}
                     />
                 )}
             </AnimatePresence>
@@ -69,13 +73,15 @@ export default function Sidebar() {
             {/* Sidebar */}
             <motion.aside
                 initial={false}
-                animate={{ x: isOpen ? 0 : 0 }} // On mobile we animate, on desktop it's static
+                animate={{
+                    width: isCollapsed ? 80 : 280,
+                    x: isMobileOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth < 1024 ? -280 : 0)
+                }}
+                transition={{ type: "spring", damping: 20, stiffness: 200 }}
                 className={`
-          fixed lg:sticky top-0 left-0 h-screen w-72 z-40
-          glass-strong border-r border-white/10
-          transition-transform duration-300 ease-in-out
-          ${isOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
-        `}
+                    fixed lg:sticky top-0 left-0 h-screen z-40
+                    glass-strong border-r border-white/10 overflow-hidden
+                `}
             >
                 {/* Decorative background element */}
                 <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10 pointer-events-none">
@@ -83,22 +89,28 @@ export default function Sidebar() {
                     <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-pink-500/10 to-transparent" />
                 </div>
 
-                <div className="flex flex-col h-full p-6">
-                    {/* Logo */}
-                    <div className="mb-8 flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-purple-500/20">
+                <div className="flex flex-col h-full p-4">
+                    {/* Logo Area */}
+                    <div className={`mb-8 flex items-center gap-3 ${isCollapsed ? 'justify-center' : 'px-2'}`}>
+                        <div className="w-10 h-10 shrink-0 rounded-xl gradient-primary flex items-center justify-center shadow-lg shadow-purple-500/20">
                             <span className="text-xl font-bold text-white">E</span>
                         </div>
-                        <div>
-                            <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70">
-                                Escape Admin
-                            </h1>
-                            <p className="text-xs text-muted-foreground">Premium Dashboard</p>
-                        </div>
+                        {!isCollapsed && (
+                            <motion.div
+                                initial={{ opacity: 0, x: -10 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: 0.1 }}
+                            >
+                                <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-white/70 whitespace-nowrap">
+                                    Escape Admin
+                                </h1>
+                                <p className="text-xs text-muted-foreground">Premium Dashboard</p>
+                            </motion.div>
+                        )}
                     </div>
 
                     {/* Navigation */}
-                    <nav className="flex-1 space-y-2">
+                    <nav className="flex-1 space-y-1">
                         {menuItems.map((item) => {
                             const Icon = item.icon;
                             const isActive = pathname === item.href;
@@ -107,26 +119,36 @@ export default function Sidebar() {
                                 <Link
                                     key={item.href}
                                     href={item.href}
-                                    onClick={() => setIsOpen(false)}
+                                    onClick={() => setIsMobileOpen(false)}
                                     className="relative group block"
                                 >
                                     <div
                                         className={`
-                      relative z-10 flex items-center gap-3 px-4 py-3 rounded-xl
-                      transition-all duration-300
-                      ${isActive
+                                            relative z-10 flex items-center gap-3 px-3 py-3 rounded-xl
+                                            transition-all duration-300
+                                            ${isActive
                                                 ? 'text-white'
                                                 : 'text-muted-foreground hover:text-white hover:bg-white/5'
                                             }
-                    `}
+                                            ${isCollapsed ? 'justify-center' : ''}
+                                        `}
                                     >
-                                        <Icon className={`w-5 h-5 transition-colors ${isActive ? 'text-white' : 'group-hover:text-white'}`} />
-                                        <span className="font-medium">{item.label}</span>
+                                        <Icon className={`w-5 h-5 shrink-0 transition-colors ${isActive ? 'text-white' : 'group-hover:text-white'}`} />
 
-                                        {isActive && (
+                                        {!isCollapsed && (
+                                            <motion.span
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                className="font-medium whitespace-nowrap"
+                                            >
+                                                {item.label}
+                                            </motion.span>
+                                        )}
+
+                                        {isActive && !isCollapsed && (
                                             <motion.div
-                                                layoutId="active-nav"
-                                                className="absolute right-4"
+                                                layoutId="active-nav-arrow"
+                                                className="ml-auto"
                                                 initial={{ opacity: 0, x: -10 }}
                                                 animate={{ opacity: 1, x: 0 }}
                                             >
@@ -135,7 +157,6 @@ export default function Sidebar() {
                                         )}
                                     </div>
 
-                                    {/* Active Background */}
                                     {isActive && (
                                         <motion.div
                                             layoutId="active-nav-bg"
@@ -150,14 +171,25 @@ export default function Sidebar() {
                         })}
                     </nav>
 
-                    {/* Logout */}
-                    <div className="pt-6 border-t border-white/10">
+                    {/* Bottom Actions */}
+                    <div className="pt-4 border-t border-white/10 space-y-1">
+                        {/* Collapse Toggle (Desktop only) */}
+                        <button
+                            onClick={toggleSidebar}
+                            className={`hidden lg:flex cursor-pointer items-center gap-3 w-full px-3 py-3 rounded-xl text-muted-foreground hover:bg-white/5 hover:text-white transition-all duration-200 group ${isCollapsed ? 'justify-center' : ''}`}
+                            title={isCollapsed ? "Expand Sidebar (Ctrl+B)" : "Collapse Sidebar (Ctrl+B)"}
+                        >
+                            {isCollapsed ? <PanelLeftOpen className="w-5 h-5" /> : <PanelLeftClose className="w-5 h-5" />}
+                            {!isCollapsed && <span className="font-medium text-sm">Collapse Sidebar</span>}
+                        </button>
+
+                        {/* Logout */}
                         <button
                             onClick={handleLogout}
-                            className="flex cursor-pointer items-center gap-3 w-full px-4 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 group"
+                            className={`flex cursor-pointer items-center gap-3 w-full px-3 py-3 rounded-xl text-red-400 hover:bg-red-500/10 hover:text-red-300 transition-all duration-200 group ${isCollapsed ? 'justify-center' : ''}`}
                         >
-                            <LogOut className="w-5 h-5 group-hover:scale-110 transition-transform" />
-                            <span className="font-medium">Logout</span>
+                            <LogOut className="w-5 h-5 shrink-0 group-hover:scale-110 transition-transform" />
+                            {!isCollapsed && <span className="font-medium">Logout</span>}
                         </button>
                     </div>
                 </div>
