@@ -11,6 +11,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "Escape Game Admin Dashboard",
   description: "Manage your escape room games with style",
+  icons: {
+    icon: '/favicon.png',
+  },
 };
 
 export default function RootLayout({
